@@ -1,0 +1,165 @@
+<div class="gm-esport-container{% if config.displayMode === 'list' %} gm-esport-container--list{% endif %}">
+  {% if matches.length === 0 %}
+    <div class="gm-esport-empty">
+      {{ 'NO_MATCHES_FOUND' | translate }}
+    </div>
+
+  {# ═══════════ LIST MODE ═══════════ #}
+  {% elif config.displayMode === 'list' %}
+    <div class="gm-esport-list">
+      {% for match in matches %}
+        <div class="gm-esport-list-row{% if match.is_live %} is-live{% endif %}{% if match.is_featured_match %} is-featured{% endif %}">
+
+          {# Date / time #}
+          <div class="gm-esport-list-date">
+            <span class="gm-esport-list-day">{{ match.displayDay }}</span>
+            {% if match.is_live %}
+              <span class="gm-esport-list-time live">🔴 {{ 'LIVE' | translate }}</span>
+            {% else %}
+              <span class="gm-esport-list-time">
+                {{ match.displayHour }}:{{ match.displayMinute }}{% if match.displayPeriod %} {{ match.displayPeriod }}{% endif %}
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="gm-esport-list-divider"></div>
+
+          {# Teams + score #}
+          <div class="gm-esport-list-match">
+
+            {# Team A #}
+            <div class="gm-esport-list-team team-a">
+              {% if match.teamA.logo %}
+                <img src="{{ match.teamA.logo }}" alt="{{ match.teamA.name }}" class="gm-esport-list-logo" onerror="this.style.display='none'">
+              {% endif %}
+              <span class="gm-esport-list-name">{{ match.teamA.name }}</span>
+            </div>
+
+            {# Score or VS #}
+            <div class="gm-esport-list-score-block">
+              {% if match.result %}
+                {% set aWins = match.scoreA > match.scoreB %}
+                <span class="gm-esport-list-score {% if aWins %}win{% else %}loss{% endif %}">{{ match.scoreA }}</span>
+                <span class="gm-esport-list-vs">-</span>
+                <span class="gm-esport-list-score {% if not aWins %}win{% else %}loss{% endif %}">{{ match.scoreB }}</span>
+              {% else %}
+                <span class="gm-esport-list-vs">vs</span>
+              {% endif %}
+            </div>
+
+            {# Team B #}
+            <div class="gm-esport-list-team team-b">
+              <span class="gm-esport-list-name">{{ match.teamB.name }}</span>
+              {% if match.teamB.logo %}
+                <img src="{{ match.teamB.logo }}" alt="{{ match.teamB.name }}" class="gm-esport-list-logo" onerror="this.style.display='none'">
+              {% endif %}
+            </div>
+
+          </div>{# end list-match #}
+
+          {# Game badge #}
+          {% if match.game %}
+            <div class="gm-esport-list-game" {% if match.game.color %}style="color: {{ match.game.color }}"{% endif %}>
+              {% if match.game.logo %}
+                <img src="{{ match.game.logo }}" alt="{{ match.game.shortName }}" class="gm-esport-list-game-logo" onerror="this.style.display='none'">
+              {% endif %}
+              <span class="gm-esport-list-game-name">{{ match.game.shortName }}</span>
+            </div>
+          {% endif %}
+
+        </div>{# end list-row #}
+      {% endfor %}
+    </div>
+
+  {# ═══════════ BANNER MODE (default) ═══════════ #}
+  {% else %}
+    <div class="gm-esport-wrapper">
+      {# Render 3 copies for seamless infinite scroll #}
+      {% for iteration in range(3) %}
+        {% for match in matches %}
+
+          <div class="gm-esport-match{% if match.is_featured_match %} is-featured{% endif %}">
+
+            {# ── Header: day + time ── #}
+            <div class="gm-esport-match-header">
+              <span class="gm-esport-match-day">{{ match.displayDay }}</span>
+              {% if match.is_live %}
+                <span class="gm-esport-match-time live">🔴 {{ 'LIVE' | translate }}</span>
+              {% else %}
+                <span class="gm-esport-match-time">
+                  {{ match.displayHour }}:{{ match.displayMinute }}
+                  {% if match.displayPeriod %} {{ match.displayPeriod }}{% endif %}
+                </span>
+              {% endif %}
+            </div>
+
+            {# ── Game badge ── #}
+            {% if match.game %}
+              <div class="gm-esport-game-badge" {% if match.game.color %}style="--gm-game-color: {{ match.game.color }}"{% endif %}>
+                {% if match.game.logo %}
+                  <img src="{{ match.game.logo }}" alt="{{ match.game.shortName }}" class="gm-esport-game-logo" onerror="this.style.display='none'">
+                {% endif %}
+                <span class="gm-esport-game-name">{{ match.game.shortName }}</span>
+              </div>
+            {% endif %}
+
+            {# ── Teams + score ── #}
+            <div class="gm-esport-match-body">
+
+              {# Team A #}
+              <div class="gm-esport-team">
+                {% if match.teamA.logo %}
+                  <img
+                    src="{{ match.teamA.logo }}"
+                    alt="{{ match.teamA.name }}"
+                    class="gm-esport-team-logo"
+                    onerror="this.style.display='none'"
+                  >
+                {% endif %}
+                <span class="gm-esport-team-name">{{ match.teamA.name }}</span>
+              </div>
+
+              {# Score or VS #}
+              <div class="gm-esport-score-block">
+                {% if match.result %}
+                  {# Determine win/loss colouring #}
+                  {% set aWins = match.scoreA > match.scoreB %}
+                  <span class="gm-esport-score {% if aWins %}win{% else %}loss{% endif %}">
+                    {{ match.scoreA }}
+                  </span>
+                  <span class="gm-esport-vs">-</span>
+                  <span class="gm-esport-score {% if not aWins %}win{% else %}loss{% endif %}">
+                    {{ match.scoreB }}
+                  </span>
+                {% else %}
+                  <span class="gm-esport-vs">vs</span>
+                {% endif %}
+              </div>
+
+              {# Team B #}
+              <div class="gm-esport-team">
+                {% if match.teamB.logo %}
+                  <img
+                    src="{{ match.teamB.logo }}"
+                    alt="{{ match.teamB.name }}"
+                    class="gm-esport-team-logo"
+                    onerror="this.style.display='none'"
+                  >
+                {% endif %}
+                <span class="gm-esport-team-name">{{ match.teamB.name }}</span>
+              </div>
+
+            </div>{# end match-body #}
+
+          </div>{# end gm-esport-match #}
+
+          {# Separator between cards #}
+          {% if not loop.last or iteration < 2 %}
+            <div class="gm-esport-separator"></div>
+          {% endif %}
+
+        {% endfor %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,420 @@
+/*
+ *
+ * MagicMirror Module: MMM-GENTLEMATE-ESPORT
+ *
+ * Author: FabienBounoir
+ * License: MIT
+ *
+ * Styles:
+ */
+
+/* ─── Container ─────────────────────────────────────────────────────────────── */
+
+.gm-esport-container {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  position: relative;
+
+  /* Fade on both edges for smooth scroll illusion */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+/* List mode: no fade mask, full width, no overflow clip */
+.gm-esport-container--list {
+  -webkit-mask-image: none;
+  mask-image: none;
+  overflow: visible;
+  display: block;
+}
+
+/* ─── Scrolling wrapper ──────────────────────────────────────────────────────── */
+
+.gm-esport-wrapper {
+  display: flex;
+  align-items: center;
+  height: auto;
+  white-space: nowrap;
+  animation: gm-scroll-left 200s linear infinite;
+  padding: 12px 20px;
+  gap: 40px;
+}
+
+@keyframes gm-scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-66.666%); }
+}
+
+/* ─── Single match card ──────────────────────────────────────────────────────── */
+
+.gm-esport-match {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+  min-width: max-content;
+}
+
+/* Featured match gets a subtle highlight */
+.gm-esport-match.is-featured .gm-esport-match-header {
+  color: #f0c040;
+}
+
+/* ─── Header (day + time) ────────────────────────────────────────────────────── */
+
+.gm-esport-match-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.gm-esport-match-day {
+  font-size: 12px;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+}
+
+.gm-esport-match-time {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.gm-esport-match-time.live {
+  color: #ff4444;
+  animation: gm-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes gm-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ─── Event name ─────────────────────────────────────────────────────────────── */
+
+.gm-esport-match-event {
+  font-size: 10px;
+  color: #888888;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+/* ─── Game badge (banner mode) ───────────────────────────────────────────────── */
+
+.gm-esport-game-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--gm-game-color, #888888) 40%, transparent);
+  background: color-mix(in srgb, var(--gm-game-color, #888888) 10%, transparent);
+  color: var(--gm-game-color, #aaaaaa);
+  align-self: center;
+}
+
+.gm-esport-game-logo {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.gm-esport-game-name {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* ─── Match body (teams + score) ─────────────────────────────────────────────── */
+
+.gm-esport-match-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* ─── Team block ─────────────────────────────────────────────────────────────── */
+
+.gm-esport-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 64px;
+}
+
+.gm-esport-team-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.gm-esport-team-name {
+  font-size: 12px;
+  color: #ffffff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Score / VS ─────────────────────────────────────────────────────────────── */
+
+.gm-esport-score-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gm-esport-score {
+  font-size: 28px;
+  color: #ffffff;
+  font-weight: 900;
+  min-width: 24px;
+  text-align: center;
+}
+
+.gm-esport-score.win  { color: #4caf50; }
+.gm-esport-score.loss { color: #f44336; }
+
+.gm-esport-vs {
+  font-size: 16px;
+  color: #666666;
+  font-weight: bold;
+}
+
+/* ─── Separator between cards ────────────────────────────────────────────────── */
+
+.gm-esport-separator {
+  width: 1px;
+  height: 72px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #555555 30%,
+    #555555 70%,
+    transparent 100%
+  );
+  flex-shrink: 0;
+  margin: 0;
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────────── */
+
+.gm-esport-empty {
+  color: #777777;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LIST MODE
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.gm-esport-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+}
+
+.gm-esport-list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s;
+}
+
+.gm-esport-list-row:last-child {
+  border-bottom: none;
+}
+
+/* Live row highlight */
+.gm-esport-list-row.is-live {
+  background: rgba(255, 68, 68, 0.08);
+  border-radius: 4px;
+  border-bottom-color: transparent;
+}
+
+/* Featured row highlight */
+.gm-esport-list-row.is-featured {
+  background: rgba(240, 192, 64, 0.07);
+  border-radius: 4px;
+  border-bottom-color: transparent;
+}
+
+/* ─── List: date/time badge ──────────────────────────────────────────────────── */
+
+.gm-esport-list-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 68px;
+  flex-shrink: 0;
+}
+
+.gm-esport-list-day {
+  font-size: 10px;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.gm-esport-list-time {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.gm-esport-list-time.live {
+  color: #ff4444;
+  font-size: 12px;
+  animation: gm-pulse 1.4s ease-in-out infinite;
+}
+
+/* ─── List: divider ──────────────────────────────────────────────────────────── */
+
+.gm-esport-list-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+/* ─── List: match center block ───────────────────────────────────────────────── */
+
+.gm-esport-list-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.gm-esport-list-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 90px;
+}
+
+/* Reverse team B so logo is on the right */
+.gm-esport-list-team.team-b {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.gm-esport-list-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.gm-esport-list-name {
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.gm-esport-list-score-block {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.gm-esport-list-score {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1;
+}
+
+.gm-esport-list-score.win  { color: #4caf50; }
+.gm-esport-list-score.loss { color: #f44336; }
+
+.gm-esport-list-vs {
+  font-size: 12px;
+  color: #555555;
+  font-weight: bold;
+}
+
+/* ─── List: game badge (right-side) ─────────────────────────────────────────── */
+
+.gm-esport-list-game {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 48px;
+  justify-content: flex-end;
+}
+
+.gm-esport-list-game-logo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+.gm-esport-list-game-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+  opacity: 0.9;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "mmm-gentlemate-esport",
+  "version": "1.0.0",
+  "description": "Display Gentlemate esport team matches as a scrolling banner in MagicMirror².",
+  "main": "MMM-GENTLEMATE-ESPORT.js",
+  "keywords": [
+    "magic mirror",
+    "module",
+    "esports",
+    "gentlemate",
+    "banner",
+    "supabase"
+  ],
+  "author": "FabienBounoir",
+  "license": "MIT"
+}
