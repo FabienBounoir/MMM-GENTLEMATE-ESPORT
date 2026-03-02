@@ -13,6 +13,9 @@
           {# Date / time #}
           <div class="gm-esport-list-date">
             <span class="gm-esport-list-day">{{ match.displayDay }}</span>
+            {% if match.displayDate %}
+              <span class="gm-esport-list-datenum">{{ match.displayDate }}</span>
+            {% endif %}
             {% if match.is_live %}
               <span class="gm-esport-list-time live">🔴 {{ 'LIVE' | translate }}</span>
             {% else %}
@@ -32,16 +35,17 @@
               {% if match.teamA.logo %}
                 <img src="{{ match.teamA.logo }}" alt="{{ match.teamA.name }}" class="gm-esport-list-logo" onerror="this.style.display='none'">
               {% endif %}
-              <span class="gm-esport-list-name">{{ match.teamA.name }}</span>
+              <span class="gm-esport-list-name{% if match.teamA.unknown %} is-unknown{% endif %}">{{ match.teamA.name }}</span>
             </div>
 
             {# Score or VS #}
             <div class="gm-esport-list-score-block">
-              {% if match.result %}
-                {% set aWins = match.scoreA > match.scoreB %}
-                <span class="gm-esport-list-score {% if aWins %}win{% else %}loss{% endif %}">{{ match.scoreA }}</span>
+              {% if match.scoreA !== null %}
+                <span class="gm-esport-list-score">{{ match.scoreA }}</span>
                 <span class="gm-esport-list-vs">-</span>
-                <span class="gm-esport-list-score {% if not aWins %}win{% else %}loss{% endif %}">{{ match.scoreB }}</span>
+                <span class="gm-esport-list-score">{{ match.scoreB }}</span>
+              {% elif match.resultText %}
+                <span class="gm-esport-list-result-text">{{ match.resultText }}</span>
               {% else %}
                 <span class="gm-esport-list-vs">vs</span>
               {% endif %}
@@ -49,7 +53,7 @@
 
             {# Team B #}
             <div class="gm-esport-list-team team-b">
-              <span class="gm-esport-list-name">{{ match.teamB.name }}</span>
+              <span class="gm-esport-list-name{% if match.teamB.unknown %} is-unknown{% endif %}">{{ match.teamB.name }}</span>
               {% if match.teamB.logo %}
                 <img src="{{ match.teamB.logo }}" alt="{{ match.teamB.name }}" class="gm-esport-list-logo" onerror="this.style.display='none'">
               {% endif %}
@@ -61,9 +65,9 @@
           {% if match.game %}
             <div class="gm-esport-list-game" {% if match.game.color %}style="color: {{ match.game.color }}"{% endif %}>
               {% if match.game.logo %}
-                <img src="{{ match.game.logo }}" alt="{{ match.game.shortName }}" class="gm-esport-list-game-logo" onerror="this.style.display='none'">
+                <img src="{{ match.game.logo }}" alt="{{ match.game.displayName }}" class="gm-esport-list-game-logo" onerror="this.style.display='none'">
               {% endif %}
-              <span class="gm-esport-list-game-name">{{ match.game.shortName }}</span>
+              <span class="gm-esport-list-game-name">{{ match.game.displayName }}</span>
             </div>
           {% endif %}
 
@@ -82,7 +86,12 @@
 
             {# ── Header: day + time ── #}
             <div class="gm-esport-match-header">
-              <span class="gm-esport-match-day">{{ match.displayDay }}</span>
+              <div class="gm-esport-match-day-block">
+                <span class="gm-esport-match-day">{{ match.displayDay }}</span>
+                {% if match.displayDate %}
+                  <span class="gm-esport-match-datenum">{{ match.displayDate }}</span>
+                {% endif %}
+              </div>
               {% if match.is_live %}
                 <span class="gm-esport-match-time live">🔴 {{ 'LIVE' | translate }}</span>
               {% else %}
@@ -97,9 +106,9 @@
             {% if match.game %}
               <div class="gm-esport-game-badge" {% if match.game.color %}style="--gm-game-color: {{ match.game.color }}"{% endif %}>
                 {% if match.game.logo %}
-                  <img src="{{ match.game.logo }}" alt="{{ match.game.shortName }}" class="gm-esport-game-logo" onerror="this.style.display='none'">
+                  <img src="{{ match.game.logo }}" alt="{{ match.game.displayName }}" class="gm-esport-game-logo" onerror="this.style.display='none'">
                 {% endif %}
-                <span class="gm-esport-game-name">{{ match.game.shortName }}</span>
+                <span class="gm-esport-game-name">{{ match.game.displayName }}</span>
               </div>
             {% endif %}
 
@@ -116,21 +125,15 @@
                     onerror="this.style.display='none'"
                   >
                 {% endif %}
-                <span class="gm-esport-team-name">{{ match.teamA.name }}</span>
+                <span class="gm-esport-team-name{% if match.teamA.unknown %} is-unknown{% endif %}">{{ match.teamA.name }}</span>
               </div>
-
-              {# Score or VS #}
               <div class="gm-esport-score-block">
-                {% if match.result %}
-                  {# Determine win/loss colouring #}
-                  {% set aWins = match.scoreA > match.scoreB %}
-                  <span class="gm-esport-score {% if aWins %}win{% else %}loss{% endif %}">
-                    {{ match.scoreA }}
-                  </span>
+                {% if match.scoreA !== null %}
+                  <span class="gm-esport-score">{{ match.scoreA }}</span>
                   <span class="gm-esport-vs">-</span>
-                  <span class="gm-esport-score {% if not aWins %}win{% else %}loss{% endif %}">
-                    {{ match.scoreB }}
-                  </span>
+                  <span class="gm-esport-score">{{ match.scoreB }}</span>
+                {% elif match.resultText %}
+                  <span class="gm-esport-result-text">{{ match.resultText }}</span>
                 {% else %}
                   <span class="gm-esport-vs">vs</span>
                 {% endif %}
@@ -146,7 +149,7 @@
                     onerror="this.style.display='none'"
                   >
                 {% endif %}
-                <span class="gm-esport-team-name">{{ match.teamB.name }}</span>
+                <span class="gm-esport-team-name{% if match.teamB.unknown %} is-unknown{% endif %}">{{ match.teamB.name }}</span>
               </div>
 
             </div>{# end match-body #}

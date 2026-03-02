@@ -85,14 +85,28 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.gm-esport-match-day-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-direction: row;
 }
 
 .gm-esport-match-day {
-  font-size: 12px;
-  color: #aaaaaa;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
+  font-weight: bold;
+}
+
+.gm-esport-match-datenum {
+  font-size: 14px;
+  color: #d1d1d1;
+  letter-spacing: 0.5px;
   font-weight: bold;
 }
 
@@ -197,6 +211,14 @@
   text-overflow: ellipsis;
 }
 
+.gm-esport-team-name.is-unknown,
+.gm-esport-list-name.is-unknown {
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
 /* ─── Score / VS ─────────────────────────────────────────────────────────────── */
 
 .gm-esport-score-block {
@@ -213,8 +235,13 @@
   text-align: center;
 }
 
-.gm-esport-score.win  { color: #4caf50; }
-.gm-esport-score.loss { color: #f44336; }
+.gm-esport-result-text {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
 .gm-esport-vs {
   font-size: 16px;
@@ -290,18 +317,28 @@
 
 .gm-esport-list-date {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 68px;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-width: 140px;
   flex-shrink: 0;
 }
 
 .gm-esport-list-day {
-  font-size: 10px;
+  font-size: 12px;
   color: #888888;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   font-weight: bold;
+  white-space: nowrap;
+}
+
+.gm-esport-list-datenum {
+  font-size: 12px;
+  color: #888888;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .gm-esport-list-time {
@@ -381,13 +418,19 @@
   line-height: 1;
 }
 
-.gm-esport-list-score.win  { color: #4caf50; }
-.gm-esport-list-score.loss { color: #f44336; }
-
 .gm-esport-list-vs {
   font-size: 12px;
   color: #555555;
   font-weight: bold;
+}
+
+.gm-esport-list-result-text {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
 }
 
 /* ─── List: game badge (right-side) ─────────────────────────────────────────── */

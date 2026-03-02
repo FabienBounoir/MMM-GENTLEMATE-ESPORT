@@ -7,13 +7,16 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     updateInterval: 5,           // minutes
     email: "",
     password: "",
-    anonKey: "",                 // Supabase anon/public key
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtcnhiYmhoeXlydG1zZnRvZmRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0MDAxNTEsImV4cCI6MjAyMjk3NjE1MX0.JYVVlCII2iL97cevWvQi0Hlz0Gt_nZjonb9ApnNDscc",                 // Supabase anon/public key
     numberOfFutureMatches: 10,
     numberOfPastMatches: 3,
-    pastDays: 30,                // how many days back to fetch
+    pastDays: 10,                // how many days back to fetch
     use24HourTime: true,
     logoTheme: "dark",           // "dark" | "white"
     displayMode: "banner",       // "banner" | "list"
+    excludeGames: [],            // short_names to hide, e.g. ["TFT", "AOE"]
+    hideUnknownTeams: false,     // hide matches where one or both teams are unknown
+    gameNameStyle: "short",      // "short" | "full"
   },
 
   requiresVersion: "2.1.0",
@@ -48,11 +51,11 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
   enrichMatch: function (match, teamsMap, gamesMap) {
     const logoKey = this.config.logoTheme === "white" ? "white_logo_url" : "dark_logo_url";
 
-    const teamA = teamsMap[match.team_a_id] || { name: "TBD", dark_logo_url: null, white_logo_url: null };
-    const teamB = teamsMap[match.team_b_id] || { name: "TBD", dark_logo_url: null, white_logo_url: null };
+    const teamA = teamsMap[match.team_a_id] || { name: "???", dark_logo_url: null, white_logo_url: null };
+    const teamB = teamsMap[match.team_b_id] || { name: "???", dark_logo_url: null, white_logo_url: null };
 
-    match.teamA = { name: teamA.name, logo: teamA[logoKey] || null };
-    match.teamB = { name: teamB.name, logo: teamB[logoKey] || null };
+    match.teamA = { name: teamA.name, logo: teamA[logoKey] || null, unknown: !teamsMap[match.team_a_id] };
+    match.teamB = { name: teamB.name, logo: teamB[logoKey] || null, unknown: !teamsMap[match.team_b_id] };
 
     if (match.team_a_bis_id && teamsMap[match.team_a_bis_id]) {
       const t = teamsMap[match.team_a_bis_id];
@@ -63,11 +66,19 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
 
     if (match.result) {
       const parts = match.result.split("-").map((s) => s.trim());
-      match.scoreA = parts[0] || "";
-      match.scoreB = parts[1] || "";
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        match.scoreA = parts[0];
+        match.scoreB = parts[1];
+        match.resultText = null;
+      } else {
+        match.scoreA = null;
+        match.scoreB = null;
+        match.resultText = match.result;
+      }
     } else {
-      match.scoreA = "";
-      match.scoreB = "";
+      match.scoreA = null;
+      match.scoreB = null;
+      match.resultText = null;
     }
 
     if (match.live_datetime) {
@@ -77,12 +88,18 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
+      const dd = String(dt.getDate()).padStart(2, "0");
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+
       if (dt.toDateString() === today.toDateString()) {
         match.displayDay = this.translate("TODAY");
+        match.displayDate = "";
       } else if (dt.toDateString() === tomorrow.toDateString()) {
         match.displayDay = this.translate("TOMORROW");
+        match.displayDate = "";
       } else {
         match.displayDay = this.translate(dayKeys[dt.getDay()]);
+        match.displayDate = dd + "/" + mm;
       }
 
       let hours = dt.getHours();
@@ -105,12 +122,19 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     }
 
     const game = (gamesMap && match.game_id) ? gamesMap[match.game_id] : null;
-    match.game = game ? {
-      name: game.name,
-      shortName: game.short_name || game.name,
-      logo: game.colored_pictogram_url || game.dark_logo_url || null,
-      color: game.primary_color || null,
-    } : null;
+    if (game) {
+      const shortName = game.short_name || game.name;
+      const fullName  = game.name || shortName;
+      match.game = {
+        name: fullName,
+        shortName,
+        displayName: this.config.gameNameStyle === "full" ? fullName : shortName,
+        logo: game.colored_pictogram_url || game.dark_logo_url || null,
+        color: game.primary_color || null,
+      };
+    } else {
+      match.game = null;
+    }
 
     return match;
   },
@@ -127,11 +151,19 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     const gamesMap = {};
     (payload.games || []).forEach((g) => { gamesMap[g.id] = g; });
 
+    const exclude = (this.config.excludeGames || []).map((s) => s.toLowerCase());
+    const matches = exclude.length
+      ? payload.matches.filter((m) => {
+          const g = gamesMap[m.game_id];
+          return !g || !exclude.includes((g.short_name || "").toLowerCase());
+        })
+      : payload.matches;
+
     const now = new Date();
     const past = [];
     const future = [];
 
-    payload.matches.forEach((m) => {
+    matches.forEach((m) => {
       if (!m.live_datetime) { future.push(m); return; }
       const dt = new Date(m.live_datetime);
       if (m.is_live) future.unshift(m);
@@ -150,7 +182,10 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     const selectedFuture = future.slice(0, this.config.numberOfFutureMatches);
 
     const all = [...selectedPast.reverse(), ...selectedFuture];
-    this.matches = all.map((m) => this.enrichMatch(m, teamsMap, gamesMap));
+    const enriched = all.map((m) => this.enrichMatch(m, teamsMap, gamesMap));
+    this.matches = this.config.hideUnknownTeams
+      ? enriched.filter((m) => !m.teamA.unknown && !m.teamB.unknown)
+      : enriched;
     this.updateDom(500);
   },
 

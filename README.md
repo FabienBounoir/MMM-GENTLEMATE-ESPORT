@@ -25,8 +25,7 @@ No external npm dependencies — only Node.js built-ins.
   position: "bottom_bar",
   config: {
     email: "your@email.com",
-    password: "yourPassword",
-    anonKey: "your-supabase-anon-key",  // Supabase dashboard → Settings → API → anon public
+    password: "yourPassword"
   }
 }
 ```
@@ -37,14 +36,42 @@ No external npm dependencies — only Node.js built-ins.
 |--------|---------|-------------|
 | `email` | `""` | Supabase account e-mail |
 | `password` | `""` | Supabase account password |
-| `anonKey` | `""` | Supabase **anon/public** key |
-| `updateInterval` | `5` | Refresh interval in minutes |
+| `updateInterval` | `10` | Refresh interval in minutes |
 | `numberOfFutureMatches` | `10` | Max upcoming matches to display |
 | `numberOfPastMatches` | `3` | Max past matches to display |
-| `pastDays` | `30` | How many days back to fetch past matches |
+| `pastDays` | `7` | How many days back to fetch past matches |
 | `use24HourTime` | `true` | `false` for AM/PM format |
 | `logoTheme` | `"dark"` | `"dark"` or `"white"` logo variant |
 | `displayMode` | `"banner"` | `"banner"` (horizontal scroll) or `"list"` (vertical static) |
+| `excludeGames` | `[]` | List of game `short_name` values to hide (see below) |
+
+---
+
+## Filtering games
+
+Use `excludeGames` to hide matches for specific games. Pass an array of `short_name` values (case-insensitive).
+
+```js
+config: {
+  excludeGames: ["TFT", "AOE"],  // hide Teamfight Tactics and Age of Empires
+}
+```
+
+Available game identifiers:
+
+| Game | `short_name` |
+|------|-------------|
+| Rocket League | `RL` |
+| Fortnite | `Fortnite` |
+| Valorant | `Valorant` |
+| Counter-Strike 2 | `CS2` |
+| Call of Duty | `CoD` |
+| Warzone | `WZ` |
+| Teamfight Tactics | `TFT` |
+| Age of Empires | `AOE` |
+| Fighting Games | `FGC` |
+
+Leave `excludeGames` empty (default) to display all games.
 
 ---
 
