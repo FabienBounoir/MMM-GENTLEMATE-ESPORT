@@ -38,7 +38,7 @@ module.exports = NodeHelper.create({
     });
   },
 
-  authenticate: async function (email, password, anonKey) {
+  authenticate: async function (email, password) {
     const now = Date.now();
     if (this.accessToken && now < this.tokenExpiresAt - 60000) {
       return this.accessToken;
@@ -54,8 +54,7 @@ module.exports = NodeHelper.create({
       headers: {
         "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(bodyStr),
-        apikey: anonKey,
-        Authorization: "Bearer " + anonKey,
+        apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtcnhiYmhoeXlydG1zZnRvZmRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0MDAxNTEsImV4cCI6MjAyMjk3NjE1MX0.JYVVlCII2iL97cevWvQi0Hlz0Gt_nZjonb9ApnNDscc"
       },
     };
 
@@ -89,7 +88,7 @@ module.exports = NodeHelper.create({
   fetchAll: async function (payload) {
     try {
       const { email, password, anonKey, pastDays } = payload;
-      const token = await this.authenticate(email, password, anonKey);
+      const token = await this.authenticate(email, password);
 
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - (pastDays || 30));
