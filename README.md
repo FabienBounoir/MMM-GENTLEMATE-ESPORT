@@ -30,6 +30,17 @@ No external npm dependencies — only Node.js built-ins.
 }
 ```
 
+## Screenshots
+
+![Banner mode](screenshot/visual.png)
+
+*Example of the scrolling banner showing upcoming matches.*
+
+![List mode](screenshot/full-render.png)
+
+*Static list layout with dates, teams and scores.*
+
+
 ### All options
 
 | Option | Default | Description |
