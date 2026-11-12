@@ -19,8 +19,8 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     gameNameStyle: "short",      // "short" | "full"
     theme: "modern",             // "modern" | "classic" (the original banner/list design)
     layout: "auto",              // modern only: "auto" | "banner" | "column" | "hero" | "list"
-    coloredPictos: false,        // modern only: game pictograms in their brand colour instead of white
-    scrollSpeed: 40,             // modern banner: scroll speed in px/s when the matches don't fit
+    coloredPictos: true,         // modern only: game pictograms and tags in the game colour (false = white)
+    scrollSpeed: 25,             // modern banner: scroll speed in px/s when the matches don't fit
   },
 
   bannerScrolls: false,
@@ -90,6 +90,7 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
       sub: event.length > 1 ? event.join(" · ") : (m.name || (m.game ? m.game.name : "")),
       picto: m.game ? m.game.logo : null,
       gameName: m.game ? m.game.displayName : "",
+      gameColor: m.game && this.config.coloredPictos ? m.game.color : null,
       dayKey: dt ? dt.toDateString() : "tbd",
       dayLabel: "–",
     };

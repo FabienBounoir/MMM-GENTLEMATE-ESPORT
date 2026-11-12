@@ -57,8 +57,8 @@ No external npm dependencies — only Node.js built-ins.
 | `excludeGames` | `[]` | List of game `short_name` values to hide (see below) |
 | `theme` | `"modern"` | `"modern"` (new design, adapts to the position) or `"classic"` (the original banner/list design) |
 | `layout` | `"auto"` | Modern theme only: `"auto"`, `"banner"`, `"column"`, `"hero"` or `"list"` |
-| `coloredPictos` | `false` | Modern theme only: game pictograms in their brand colour instead of white |
-| `scrollSpeed` | `40` | Modern banner only: scroll speed in px/s when the matches don't fit |
+| `coloredPictos` | `true` | Modern theme only: game tags and pictograms in the game colour (`false` = white) |
+| `scrollSpeed` | `25` | Modern banner only: scroll speed in px/s when the matches don't fit |
 
 ---
 

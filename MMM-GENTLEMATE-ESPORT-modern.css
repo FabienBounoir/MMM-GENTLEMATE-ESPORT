@@ -73,6 +73,12 @@
 /* Game tag: pictogram + game name, on every match */
 .gmm-game { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #b3b3b3; white-space: nowrap; }
 .gmm-game .gmm-picto { width: 15px; height: 15px; }
+/* Coloured tag, like the classic theme's game badge */
+.gmm-game-color {
+  align-self: flex-start; padding: 2px 8px; border-radius: 20px; color: var(--gmm-game);
+  border: 1px solid color-mix(in srgb, var(--gmm-game) 45%, transparent);
+  background: color-mix(in srgb, var(--gmm-game) 12%, transparent);
+}
 
 /* ─── Hero (middle_center, thirds, fullscreen) ───────────────── */
 .gmm--hero { display: flex; flex-direction: column; gap: 28px; padding: 24px 0; }

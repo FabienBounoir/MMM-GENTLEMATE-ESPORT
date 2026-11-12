@@ -17,7 +17,7 @@
 {% endmacro %}
 
 {% macro game(v, pf) %}
-  {% if v.gameName %}<div class="gmm-game">{{ picto(v, pf) }}<span>{{ v.gameName }}</span></div>{% endif %}
+  {% if v.gameName %}<div class="gmm-game{% if v.gameColor %} gmm-game-color{% endif %}"{% if v.gameColor %} style="--gmm-game: {{ v.gameColor }}"{% endif %}>{{ picto(v, pf) }}<span>{{ v.gameName }}</span></div>{% endif %}
 {% endmacro %}
 
 {% macro when(v) %}
