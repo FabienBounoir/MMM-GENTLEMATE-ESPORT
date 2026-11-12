@@ -16,6 +16,10 @@
   {% if v.picto %}<img class="gmm-picto{{ pf }}" src="{{ v.picto }}" alt="" onerror="this.style.display='none'">{% endif %}
 {% endmacro %}
 
+{% macro game(v, pf) %}
+  {% if v.gameName %}<div class="gmm-game">{{ picto(v, pf) }}<span>{{ v.gameName }}</span></div>{% endif %}
+{% endmacro %}
+
 {% macro when(v) %}
   {% if v.live %}
     <span class="gmm-live"><span class="gmm-dot"></span>{{ 'LIVE' | translate }}</span>
@@ -39,22 +43,28 @@
   <div class="gmm-banner-next">
     {{ icon(v, 'xl', pf) }}
     <div class="gmm-stack">
+      {{ game(v, pf) }}
       <div class="gmm-row">{{ when(v) }}<span class="gmm-time">{{ bigline(v) }}</span></div>
       <div class="gmm-title-l">{% if v.kind !== 'picto' %}vs {% endif %}{{ v.title }}</div>
-      <div class="gmm-row gmm-dim">{{ picto(v, pf) }}<span>{{ v.sub }}</span></div>
+      <div class="gmm-dim">{{ v.sub }}</div>
     </div>
   </div>
   {% endif %}
   {% if view.rest.length %}
   <div class="gmm-divider"></div>
-  <div class="gmm-banner-rest">
-    {% for v in view.rest %}
-      <div class="gmm-banner-item">
-        <div class="gmm-row gmm-nowrap"><span class="gmm-label">{{ v.dayLabel }}</span><span class="gmm-time-s">{{ v.time }}</span></div>
-        <div class="gmm-row">{{ icon(v, 's', pf) }}<span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span></div>
-        <div class="gmm-dim gmm-ellipsis">{{ v.sub }}</div>
-      </div>
-    {% endfor %}
+  <div class="gmm-banner-rest{% if view.scrolling %} gmm-scrolling{% endif %}">
+    <div class="gmm-track"{% if view.scrolling %} style="animation-duration: {{ view.scrollSeconds }}s; animation-delay: {{ view.scrollDelay }}s"{% endif %}>
+      {% for copy in range(2 if view.scrolling else 1) %}
+      {% for v in view.rest %}
+        <div class="gmm-banner-item"{% if copy %} aria-hidden="true"{% endif %}>
+          {{ game(v, pf) }}
+          <div class="gmm-row gmm-nowrap"><span class="gmm-label">{{ v.dayLabel }}</span><span class="gmm-time-s">{{ v.time }}</span></div>
+          <div class="gmm-row">{{ icon(v, 's', pf) }}<span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span></div>
+          <div class="gmm-dim gmm-ellipsis">{{ v.sub }}</div>
+        </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
 
@@ -98,7 +108,8 @@
         <span class="gmm-title-m gmm-ellipsis">{% if v.kind !== 'picto' %}vs {% endif %}{{ v.title }}</span>
       </div>
     </div>
-    <div class="gmm-row gmm-dim">{{ picto(v, pf) }}<span class="gmm-ellipsis">{{ v.sub }}</span></div>
+    {{ game(v, pf) }}
+    <div class="gmm-dim gmm-ellipsis">{{ v.sub }}</div>
   </div>
   {% endif %}
   {% for d in view.restDays %}
@@ -110,7 +121,7 @@
           {{ icon(v, 's', pf) }}
           <div class="gmm-stack gmm-min0">
             <span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span>
-            <span class="gmm-dim gmm-ellipsis">{{ v.sub }}</span>
+            <span class="gmm-dim gmm-ellipsis">{% if v.gameName %}{{ v.gameName }} · {% endif %}{{ v.sub }}</span>
           </div>
         </div>
       {% endfor %}
@@ -142,7 +153,7 @@
           {{ icon(v, 'm', pf) }}
           <div class="gmm-row gmm-min0">
             <span class="gmm-title-m">{{ v.title }}</span>
-            <span class="gmm-dim gmm-ellipsis">{{ v.sub }}</span>
+            <span class="gmm-dim gmm-ellipsis">{% if v.gameName %}{{ v.gameName }} · {% endif %}{{ v.sub }}</span>
           </div>
           <span class="gmm-right">
             {% if v.live %}<span class="gmm-live"><span class="gmm-dot"></span>{{ v.score or ('LIVE' | translate) }}</span>

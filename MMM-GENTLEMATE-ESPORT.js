@@ -20,7 +20,10 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     theme: "modern",             // "modern" | "classic" (the original banner/list design)
     layout: "auto",              // modern only: "auto" | "banner" | "column" | "hero" | "list"
     coloredPictos: false,        // modern only: game pictograms in their brand colour instead of white
+    scrollSpeed: 40,             // modern banner: scroll speed in px/s when the matches don't fit
   },
+
+  bannerScrolls: false,
 
   requiresVersion: "2.1.0",
   matches: [],
@@ -52,6 +55,21 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
 
   // ─── Modern theme ──────────────────────────────────────────────────────────
 
+  // After each render: make the banner scroll only if its matches don't fit.
+  notificationReceived: function (notification, payload, sender) {
+    if (notification !== "MODULE_DOM_UPDATED" || !this.isModern()) return;
+    const root = document.getElementById(this.identifier);
+    const rest = root && root.querySelector(".gmm-banner-rest");
+    const track = rest && rest.querySelector(".gmm-track");
+    if (!track) return;
+    // While scrolling the track holds the matches twice.
+    const scrolls = track.scrollWidth / (this.bannerScrolls ? 2 : 1) > rest.clientWidth + 1;
+    if (scrolls !== this.bannerScrolls) {
+      this.bannerScrolls = scrolls;
+      this.updateDom(0);
+    }
+  },
+
   pickLayout: function () {
     if (this.config.layout !== "auto") return this.config.layout;
     const pos = (this.data && this.data.position) || "";
@@ -71,6 +89,7 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
       time: dt ? m.displayHour + ":" + m.displayMinute + (m.displayPeriod ? " " + m.displayPeriod : "") : "--:--",
       sub: event.length > 1 ? event.join(" · ") : (m.name || (m.game ? m.game.name : "")),
       picto: m.game ? m.game.logo : null,
+      gameName: m.game ? m.game.displayName : "",
       dayKey: dt ? dt.toDateString() : "tbd",
       dayLabel: "–",
     };
@@ -137,9 +156,15 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     const results = all.filter((v) => upcoming.indexOf(v) === -1 && v.score).reverse();
     const next = upcoming[0] || null;
     const rest = upcoming.slice(1);
+    // Scroll duration from a constant speed (item = 230px + 32px gap); the delay is
+    // derived from the clock so re-rendering every minute doesn't restart the scroll.
+    const scrollSeconds = Math.max(1, Math.round((rest.length * 262) / this.config.scrollSpeed));
     return {
       layout: this.pickLayout(),
       pictoFilter: this.config.coloredPictos ? "" : " gmm-white",
+      scrolling: this.bannerScrolls,
+      scrollSeconds,
+      scrollDelay: -((now.getTime() / 1000) % scrollSeconds).toFixed(1),
       next,
       rest,
       restDays: this.groupByDay(rest),

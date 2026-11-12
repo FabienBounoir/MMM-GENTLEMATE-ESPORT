@@ -57,10 +57,22 @@
 .gmm-banner-next { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
 .gmm-banner-next .gmm-row { gap: 12px; }
 .gmm-divider { width: 1px; align-self: stretch; margin: 12px 0; background: #333; flex-shrink: 0; }
-/* Items that don't fit wrap onto a hidden second line: no scrolling, no cut cards. */
-.gmm-banner-rest { display: flex; flex-wrap: wrap; gap: 0 32px; flex: 1; min-width: 0; height: 84px; overflow: hidden; }
-.gmm-banner-item { display: flex; flex-direction: column; gap: 6px; flex: 1 0 190px; max-width: 280px; height: 84px; min-width: 0; }
+/* The matches after the next one. If they don't fit, the module adds .gmm-scrolling
+   (measured after render) and the track, holding them twice, loops right to left. */
+.gmm-banner-rest { flex: 1; min-width: 0; overflow: hidden; }
+.gmm-track { display: flex; width: max-content; }
+.gmm-banner-item { display: flex; flex-direction: column; gap: 6px; width: 230px; padding-right: 32px; flex-shrink: 0; }
 .gmm-banner-item .gmm-label { font-size: 13px; letter-spacing: 1.5px; }
+.gmm-scrolling {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+.gmm-scrolling .gmm-track { animation: gmm-scroll linear infinite; }
+@keyframes gmm-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Game tag: pictogram + game name, on every match */
+.gmm-game { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #b3b3b3; white-space: nowrap; }
+.gmm-game .gmm-picto { width: 15px; height: 15px; }
 
 /* ─── Hero (middle_center, thirds, fullscreen) ───────────────── */
 .gmm--hero { display: flex; flex-direction: column; gap: 28px; padding: 24px 0; }

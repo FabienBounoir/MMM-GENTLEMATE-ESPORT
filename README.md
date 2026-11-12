@@ -58,6 +58,7 @@ No external npm dependencies — only Node.js built-ins.
 | `theme` | `"modern"` | `"modern"` (new design, adapts to the position) or `"classic"` (the original banner/list design) |
 | `layout` | `"auto"` | Modern theme only: `"auto"`, `"banner"`, `"column"`, `"hero"` or `"list"` |
 | `coloredPictos` | `false` | Modern theme only: game pictograms in their brand colour instead of white |
+| `scrollSpeed` | `40` | Modern banner only: scroll speed in px/s when the matches don't fit |
 
 ---
 
@@ -67,7 +68,7 @@ No external npm dependencies — only Node.js built-ins.
 
 | Position | Layout |
 |----------|--------|
-| `top_bar`, `bottom_bar`, `top_center`, `bottom_center` | **Banner**: next match large, the following ones beside it (no scrolling, what doesn't fit is hidden) |
+| `top_bar`, `bottom_bar`, `top_center`, `bottom_center` | **Banner**: next match large, the following ones beside it, scrolling only when they don't fit |
 | `top_left`, `top_right`, `bottom_left`, `bottom_right` | **Column**: next match, upcoming matches grouped by day, latest results (W/L) |
 | `upper_third`, `middle_center`, `lower_third`, `fullscreen_*` | **Hero**: one match, large, with countdown or live score |
 
