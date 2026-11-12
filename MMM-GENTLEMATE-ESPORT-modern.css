@@ -1,0 +1,93 @@
+/*
+ * MMM-GENTLEMATE-ESPORT — modern theme (config.theme = "modern").
+ * Light & greys only: colours barely show through a two-way mirror.
+ */
+
+.gmm { color: #b3b3b3; font-size: 16px; line-height: 1.2; text-align: left; }
+.gmm img { display: block; }
+
+/* ─── Shared bits ───────────────────────────────────────────── */
+.gmm-row { display: flex; align-items: center; gap: 10px; }
+.gmm-stack { display: flex; flex-direction: column; gap: 4px; }
+.gmm-between { justify-content: space-between; }
+.gmm-center { justify-content: center; text-align: center; }
+.gmm-min0 { min-width: 0; }
+.gmm-nowrap { white-space: nowrap; }
+.gmm-ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+.gmm-dim { color: #8a8a8a; font-size: 15px; }
+.gmm-normal { color: #b3b3b3; }
+.gmm-bright { color: #fff !important; }
+.gmm-label { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #8a8a8a; white-space: nowrap; }
+.gmm-rule { display: block; padding-bottom: 6px; border-bottom: 1px solid #333; }
+
+.gmm-time { font-size: 30px; color: #fff; }
+.gmm-time-l { font-size: 44px; line-height: 1; color: #fff; font-weight: 300; }
+.gmm-time-s { font-size: 20px; color: #fff; }
+.gmm-huge { font-size: 96px; line-height: 1; color: #fff; font-weight: 300; }
+.gmm-title-l { font-size: 34px; line-height: 1.05; color: #fff; font-weight: 300; }
+.gmm-title-m { font-size: 22px; color: #fff; font-weight: 300; }
+.gmm-title-s { font-size: 18px; color: #d9d9d9; }
+.gmm-score-s { font-size: 18px; color: #fff; }
+
+/* Logos, initials, pictograms */
+.gmm-icon { object-fit: contain; flex-shrink: 0; }
+.gmm-mono {
+  flex-shrink: 0; box-sizing: border-box; border: 1px solid #666; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #b3b3b3; font-size: 11px;
+}
+.gmm-tbd { border-style: dashed; color: #8a8a8a; }
+.gmm-s { width: 26px; height: 26px; }
+.gmm-m { width: 36px; height: 36px; font-size: 13px; }
+.gmm-l { width: 64px; height: 64px; font-size: 18px; }
+.gmm-xl { width: 84px; height: 84px; font-size: 22px; }
+.gmm-xxl { width: 128px; height: 128px; font-size: 32px; }
+.gmm-picto { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
+.gmm-white { filter: brightness(0) invert(1); opacity: 0.85; }
+
+/* Live: a pulsing white dot, no colour */
+.gmm-live { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+.gmm-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; animation: gmm-pulse 1.6s ease-in-out infinite; }
+@keyframes gmm-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+
+.gmm-day { display: flex; flex-direction: column; gap: 8px; }
+
+/* ─── Banner (top_bar / bottom_bar) ─────────────────────────── */
+.gmm--banner { display: flex; align-items: center; gap: 36px; padding: 16px 20px; }
+.gmm-banner-next { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.gmm-banner-next .gmm-row { gap: 12px; }
+.gmm-divider { width: 1px; align-self: stretch; margin: 12px 0; background: #333; flex-shrink: 0; }
+/* Items that don't fit wrap onto a hidden second line: no scrolling, no cut cards. */
+.gmm-banner-rest { display: flex; flex-wrap: wrap; gap: 0 32px; flex: 1; min-width: 0; height: 84px; overflow: hidden; }
+.gmm-banner-item { display: flex; flex-direction: column; gap: 6px; flex: 1 0 190px; max-width: 280px; height: 84px; min-width: 0; }
+.gmm-banner-item .gmm-label { font-size: 13px; letter-spacing: 1.5px; }
+
+/* ─── Hero (middle_center, thirds, fullscreen) ───────────────── */
+.gmm--hero { display: flex; flex-direction: column; gap: 28px; padding: 24px 0; }
+.gmm-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 56px; }
+.gmm-hero-team { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.gmm-hero-team .gmm-title-m { font-size: 26px; }
+.gmm-hero-mid { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.gmm-hero-mid .gmm-dim { font-size: 20px; }
+.gmm-then { gap: 40px; font-size: 16px; }
+
+/* ─── Column (top_left, top_right, …) ───────────────────────── */
+.gmm--column { display: flex; flex-direction: column; gap: 22px; width: 340px; max-width: 100%; }
+.gmm-col-next { display: flex; flex-direction: column; gap: 10px; }
+.gmm-col-next .gmm-row { gap: 16px; }
+.gmm-col-next .gmm-dim .gmm-picto, .gmm-col-next .gmm-dim { gap: 8px; }
+.gmm-col-row { display: grid; grid-template-columns: 48px 26px minmax(0, 1fr); align-items: center; gap: 10px; }
+.gmm-col-row .gmm-dim { font-size: 13px; }
+.gmm-res-row { display: grid; grid-template-columns: 22px 26px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.gmm-wl { font-size: 16px; font-weight: 700; color: #fff; }
+.gmm-loss .gmm-wl, .gmm-loss .gmm-title-s, .gmm-loss .gmm-score-s { color: #8a8a8a; }
+
+/* ─── List (layout: "list") ──────────────────────────────────── */
+.gmm--list { display: flex; flex-direction: column; gap: 24px; min-width: 640px; }
+.gmm-list-row { display: grid; grid-template-columns: 64px 18px 36px minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.gmm-list-row .gmm-row { gap: 14px; align-items: baseline; }
+.gmm-list-row .gmm-title-m { white-space: nowrap; }
+.gmm-right { text-align: right; white-space: nowrap; font-size: 18px; color: #fff; }
+.gmm-past { opacity: 0.7; }
+.gmm-past .gmm-right { font-size: 20px; }
+.gmm-loss .gmm-right { color: #8a8a8a; }

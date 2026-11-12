@@ -50,7 +50,6 @@ module.exports = NodeHelper.create({
       port: 443,
       path: "/auth/v1/token?grant_type=password",
       method: "POST",
-      rejectUnauthorized: false,
       headers: {
         "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(bodyStr),
@@ -74,7 +73,6 @@ module.exports = NodeHelper.create({
       port: 443,
       path,
       method: "GET",
-      rejectUnauthorized: false,
       headers: {
         apikey: anonKey,
         Authorization: "Bearer " + token,
@@ -102,10 +100,6 @@ module.exports = NodeHelper.create({
         this.supabaseGet(matchPath, token, anonKey),
         this.supabaseGet("/rest/v1/games?select=*", token, anonKey),
       ]);
-
-      console.log("[MMM-GENTLEMATE-ESPORT] ", "Teams response: ", teamsRes);
-      console.log("[MMM-GENTLEMATE-ESPORT] ", "Matches response: ", matchesRes);
-      console.log("[MMM-GENTLEMATE-ESPORT] ", "Games response: ", gamesRes);
       console.log("[MMM-GENTLEMATE-ESPORT] Data fetched: " + teamsRes.data.length + " teams, " + matchesRes.data.length + " matches, " + (Array.isArray(gamesRes.data) ? gamesRes.data.length : 0) + " games");
 
 

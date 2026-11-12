@@ -1,0 +1,158 @@
+{# Modern theme. Layout picked from the module position (config.layout = "auto"). #}
+
+{% macro icon(v, size, pf) %}
+  {% if v.kind === 'logo' %}
+    <img class="gmm-icon gmm-{{ size }}" src="{{ v.logo }}" alt="" onerror="this.style.visibility='hidden'">
+  {% elif v.kind === 'picto' and v.picto %}
+    <img class="gmm-icon gmm-{{ size }}{{ pf }}" src="{{ v.picto }}" alt="" onerror="this.style.visibility='hidden'">
+  {% elif v.kind === 'tbd' %}
+    <span class="gmm-mono gmm-tbd gmm-{{ size }}">?</span>
+  {% else %}
+    <span class="gmm-mono gmm-{{ size }}">{{ v.mono }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro picto(v, pf) %}
+  {% if v.picto %}<img class="gmm-picto{{ pf }}" src="{{ v.picto }}" alt="" onerror="this.style.display='none'">{% endif %}
+{% endmacro %}
+
+{% macro when(v) %}
+  {% if v.live %}
+    <span class="gmm-live"><span class="gmm-dot"></span>{{ 'LIVE' | translate }}</span>
+  {% else %}
+    <span class="gmm-label">{{ v.dayLabel }}</span>
+    {% if v.countdown %}<span class="gmm-dim">{{ v.countdown }}</span>{% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% macro bigline(v) %}{% if v.live and v.score %}{{ v.score }}{% else %}{{ v.time }}{% endif %}{% endmacro %}
+
+{% set pf = view.pictoFilter %}
+<div class="gmm gmm--{{ view.layout }}">
+
+{% if not view.next and not view.results.length %}
+  <div class="gmm-dim">{{ 'NO_MATCHES_FOUND' | translate }}</div>
+
+{# ═══════════ BANNER ═══════════ #}
+{% elif view.layout === 'banner' %}
+  {% if view.next %}{% set v = view.next %}
+  <div class="gmm-banner-next">
+    {{ icon(v, 'xl', pf) }}
+    <div class="gmm-stack">
+      <div class="gmm-row">{{ when(v) }}<span class="gmm-time">{{ bigline(v) }}</span></div>
+      <div class="gmm-title-l">{% if v.kind !== 'picto' %}vs {% endif %}{{ v.title }}</div>
+      <div class="gmm-row gmm-dim">{{ picto(v, pf) }}<span>{{ v.sub }}</span></div>
+    </div>
+  </div>
+  {% endif %}
+  {% if view.rest.length %}
+  <div class="gmm-divider"></div>
+  <div class="gmm-banner-rest">
+    {% for v in view.rest %}
+      <div class="gmm-banner-item">
+        <div class="gmm-row gmm-nowrap"><span class="gmm-label">{{ v.dayLabel }}</span><span class="gmm-time-s">{{ v.time }}</span></div>
+        <div class="gmm-row">{{ icon(v, 's', pf) }}<span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span></div>
+        <div class="gmm-dim gmm-ellipsis">{{ v.sub }}</div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+{# ═══════════ HERO (center) ═══════════ #}
+{% elif view.layout === 'hero' %}
+  {% set v = view.next or view.results[0] %}
+  <div class="gmm-row gmm-label gmm-center">{{ picto(v, pf) }}<span>{% if v._m.game %}{{ v._m.game.name }} · {% endif %}{{ v.sub }}</span></div>
+  <div class="gmm-hero">
+    <div class="gmm-hero-team">
+      {% if v.us.logo %}<img class="gmm-icon gmm-xxl" src="{{ v.us.logo }}" alt="">{% endif %}
+      <span class="gmm-title-m">{{ v.us.name }}</span>
+    </div>
+    <div class="gmm-hero-mid">
+      <span class="gmm-huge">{% if v.score %}{{ v.score }}{% else %}{{ v.time }}{% endif %}</span>
+      {% if v.live %}<span class="gmm-live"><span class="gmm-dot"></span>{{ 'LIVE' | translate }}</span>
+      {% elif v.score %}<span class="gmm-dim">{{ v.wl }}</span>
+      {% else %}<span class="gmm-dim">{{ v.dayLabel }}{% if v.countdown %} · {{ v.countdown }}{% endif %}</span>{% endif %}
+    </div>
+    <div class="gmm-hero-team">
+      {{ icon(v, 'xxl', pf) }}
+      <span class="gmm-title-m">{{ v.title }}</span>
+    </div>
+  </div>
+  {% if view.next and view.rest.length %}
+  <div class="gmm-row gmm-dim gmm-center gmm-then">
+    {% for r in view.rest.slice(0, 2) %}
+      <span>{{ r.dayLabel }} {{ r.time }} · <span class="gmm-normal">{{ r.title }}</span></span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+{# ═══════════ COLUMN ═══════════ #}
+{% elif view.layout === 'column' %}
+  {% if view.next %}{% set v = view.next %}
+  <div class="gmm-col-next">
+    <div class="gmm-row gmm-between">{{ when(v) }}</div>
+    <div class="gmm-row">
+      {{ icon(v, 'l', pf) }}
+      <div class="gmm-stack gmm-min0">
+        <span class="gmm-time-l">{{ bigline(v) }}</span>
+        <span class="gmm-title-m gmm-ellipsis">{% if v.kind !== 'picto' %}vs {% endif %}{{ v.title }}</span>
+      </div>
+    </div>
+    <div class="gmm-row gmm-dim">{{ picto(v, pf) }}<span class="gmm-ellipsis">{{ v.sub }}</span></div>
+  </div>
+  {% endif %}
+  {% for d in view.restDays %}
+    <div class="gmm-day">
+      <span class="gmm-label">{{ d.label }}</span>
+      {% for v in d.matches %}
+        <div class="gmm-col-row">
+          <span class="gmm-time-s">{{ v.time }}</span>
+          {{ icon(v, 's', pf) }}
+          <div class="gmm-stack gmm-min0">
+            <span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span>
+            <span class="gmm-dim gmm-ellipsis">{{ v.sub }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  {% if view.results.length %}
+    <div class="gmm-day">
+      <span class="gmm-label gmm-rule">{{ 'RESULTS' | translate }}</span>
+      {% for v in view.results %}
+        <div class="gmm-res-row{% if not v.win %} gmm-loss{% endif %}">
+          <span class="gmm-wl">{{ v.wl }}</span>
+          {{ icon(v, 's', pf) }}
+          <span class="gmm-title-s gmm-ellipsis">{{ v.title }}</span>
+          <span class="gmm-score-s">{{ v.score }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+{# ═══════════ LIST ═══════════ #}
+{% else %}
+  {% for d in view.listDays %}
+    <div class="gmm-day">
+      <span class="gmm-label{% if d.matches[0].dayKey === view.next.dayKey %} gmm-bright{% endif %}">{{ d.label }}</span>
+      {% for v in d.matches %}
+        <div class="gmm-list-row{% if v.past %} gmm-past{% endif %}{% if v.past and not v.win %} gmm-loss{% endif %}">
+          <span class="gmm-time-s">{{ v.time }}</span>
+          <span>{% if v.kind !== 'picto' %}{{ picto(v, pf) }}{% endif %}</span>
+          {{ icon(v, 'm', pf) }}
+          <div class="gmm-row gmm-min0">
+            <span class="gmm-title-m">{{ v.title }}</span>
+            <span class="gmm-dim gmm-ellipsis">{{ v.sub }}</span>
+          </div>
+          <span class="gmm-right">
+            {% if v.live %}<span class="gmm-live"><span class="gmm-dot"></span>{{ v.score or ('LIVE' | translate) }}</span>
+            {% elif v.past %}<b>{{ v.wl }}</b> {{ v.score }}
+            {% else %}{{ v.countdown }}{% endif %}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endif %}
+
+</div>

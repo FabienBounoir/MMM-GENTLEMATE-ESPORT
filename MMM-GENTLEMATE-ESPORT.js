@@ -17,6 +17,9 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     excludeGames: [],            // short_names to hide, e.g. ["TFT", "AOE"]
     hideUnknownTeams: false,     // hide matches where one or both teams are unknown
     gameNameStyle: "short",      // "short" | "full"
+    theme: "modern",             // "modern" | "classic" (the original banner/list design)
+    layout: "auto",              // modern only: "auto" | "banner" | "column" | "hero" | "list"
+    coloredPictos: false,        // modern only: game pictograms in their brand colour instead of white
   },
 
   requiresVersion: "2.1.0",
@@ -30,13 +33,119 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     };
   },
 
-  getStyles: function () { return ["MMM-GENTLEMATE-ESPORT.css"]; },
-  getTemplate: function () { return "templates/MMM-GENTLEMATE-ESPORT.njk"; },
-  getTemplateData: function () { return { config: this.config, matches: this.matches }; },
+  getStyles: function () { return ["MMM-GENTLEMATE-ESPORT.css", "MMM-GENTLEMATE-ESPORT-modern.css"]; },
+  isModern: function () { return this.config.theme !== "classic"; },
+  getTemplate: function () {
+    return this.isModern() ? "templates/modern.njk" : "templates/MMM-GENTLEMATE-ESPORT.njk";
+  },
+  getTemplateData: function () {
+    if (!this.isModern()) return { config: this.config, matches: this.matches };
+    return { config: this.config, view: this.buildView(this.matches, new Date()) };
+  },
 
   start: function () {
     this.getData();
     setInterval(() => this.getData(), this.config.updateInterval * 60 * 1000);
+    // Modern theme shows "in 25 min" countdowns: re-render every minute.
+    if (this.isModern()) setInterval(() => { if (this.matches.length) this.updateDom(0); }, 60 * 1000);
+  },
+
+  // ─── Modern theme ──────────────────────────────────────────────────────────
+
+  pickLayout: function () {
+    if (this.config.layout !== "auto") return this.config.layout;
+    const pos = (this.data && this.data.position) || "";
+    if (/_(left|right)$/.test(pos)) return "column";
+    if (/^(upper_third|middle_center|lower_third|fullscreen)/.test(pos)) return "hero";
+    return "banner";
+  },
+
+  pad: function (n) { return String(n).padStart(2, "0"); },
+
+  // One match as the modern templates need it, relative to `now`.
+  viewMatch: function (m, now) {
+    const dt = m.live_datetime ? new Date(m.live_datetime) : null;
+    const event = (m.name || "").split(/\s+-\s+/);
+    const v = {
+      live: !!m.is_live,
+      time: dt ? m.displayHour + ":" + m.displayMinute + (m.displayPeriod ? " " + m.displayPeriod : "") : "--:--",
+      sub: event.length > 1 ? event.join(" · ") : (m.name || (m.game ? m.game.name : "")),
+      picto: m.game ? m.game.logo : null,
+      dayKey: dt ? dt.toDateString() : "tbd",
+      dayLabel: "–",
+    };
+
+    if (dt) {
+      const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+      if (dt.toDateString() === now.toDateString()) v.dayLabel = this.translate(dt.getHours() >= 18 ? "TONIGHT" : "TODAY");
+      else if (dt.toDateString() === tomorrow.toDateString()) v.dayLabel = this.translate("TOMORROW");
+      else v.dayLabel = m.displayDay + " " + this.pad(dt.getDate()) + "/" + this.pad(dt.getMonth() + 1);
+
+      const mins = Math.round((dt - now) / 60000);
+      if (mins > 0 && mins < 24 * 60) {
+        const h = Math.floor(mins / 60), mn = mins % 60;
+        v.countdown = this.translate("IN", { time: h ? h + " h" + (mn ? " " + this.pad(mn) : "") : mn + " min" });
+      }
+    }
+
+    // Opponent: a team, a team not known yet, or nobody (a tournament).
+    if (!m.team_b_id) {
+      v.kind = "picto";
+      v.title = event[0] || (m.game ? m.game.name : "");
+      v.sub = event.length > 1 ? event.slice(1).join(" · ") : (m.game ? m.game.name : "");
+    } else if (m.teamB.unknown || m.teamB.name.trim() === "?") {
+      v.kind = "tbd";
+      v.title = this.translate("TBD");
+    } else {
+      v.kind = m.teamB.logo ? "logo" : "mono";
+      v.title = m.teamB.name;
+      v.logo = m.teamB.logo;
+      const words = m.teamB.name.trim().split(/\s+/);
+      v.mono = (words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2)).toUpperCase();
+    }
+    v.us = m.teamA;
+
+    if (m.scoreA !== null && m.scoreA !== undefined) {
+      const a = Number(m.scoreA), b = Number(m.scoreB);
+      v.score = a + "-" + b;
+      v.win = a > b;
+      v.wl = a === b ? "" : this.translate(a > b ? "WIN_SHORT" : "LOSS_SHORT");
+    } else if (m.resultText) {
+      v.score = m.resultText;
+    }
+    return v;
+  },
+
+  groupByDay: function (list) {
+    const days = [];
+    list.forEach((v) => {
+      const last = days[days.length - 1];
+      if (last && last.key === v.dayKey) last.matches.push(v);
+      else days.push({ key: v.dayKey, label: v.dayLabel, matches: [v] });
+    });
+    return days;
+  },
+
+  buildView: function (matches, now) {
+    const all = matches.map((m) => Object.assign(this.viewMatch(m, now), { _m: m }));
+    // Upcoming: live, not played yet, or started less than 3 h ago without a result.
+    const upcoming = all.filter((v) => {
+      const m = v._m;
+      if (m.is_live || !m.live_datetime) return true;
+      return !m.result && new Date(m.live_datetime) > now - 3 * 3600 * 1000;
+    });
+    const results = all.filter((v) => upcoming.indexOf(v) === -1 && v.score).reverse();
+    const next = upcoming[0] || null;
+    const rest = upcoming.slice(1);
+    return {
+      layout: this.pickLayout(),
+      pictoFilter: this.config.coloredPictos ? "" : " gmm-white",
+      next,
+      rest,
+      restDays: this.groupByDay(rest),
+      results,
+      listDays: this.groupByDay(results.slice().reverse().concat(upcoming).map((v) => Object.assign(v, { past: upcoming.indexOf(v) === -1 }))),
+    };
   },
 
   getData: function () {

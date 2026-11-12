@@ -9,5 +9,11 @@
   "WEDNESDAY": "Miércoles",
   "THURSDAY": "Jueves",
   "FRIDAY": "Viernes",
-  "SATURDAY": "Sábado"
+  "SATURDAY": "Sábado",
+  "TONIGHT": "Esta noche",
+  "IN": "en {time}",
+  "TBD": "Por determinar",
+  "RESULTS": "Últimos resultados",
+  "WIN_SHORT": "V",
+  "LOSS_SHORT": "D"
 }
