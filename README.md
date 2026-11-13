@@ -1,8 +1,52 @@
 # MMM-GENTLEMATE-ESPORT
 
-A [MagicMirror²](https://magicmirror.builders/) module that displays **Gentlemate esport** matches as a scrolling banner or a static list.
+A [MagicMirror²](https://magicmirror.builders/) module for **Gentle Mates** esport matches: next match with countdown, live score, upcoming schedule and latest results, for Rocket League, Fortnite, Valorant and the other Gentle Mates rosters.
 
-Data is fetched from the Gentlemate Supabase backend and refreshed automatically.
+The layout adapts to where you put the module: a banner across the top, a column in a corner, or one big match in the middle of the mirror.
+
+![Hero layout, live](screenshot/modern-live.png)
+
+---
+
+## Layouts
+
+The default **modern** theme picks its layout from the module `position` (or force one with `layout`).
+
+### Banner — `top_bar`, `bottom_bar`, `top_center`, `bottom_center`
+
+The next match large on the left, the following ones beside it. They scroll slowly, right to left, only when they don't fit.
+
+![Banner layout](screenshot/modern-banner.png)
+
+### Column — `top_left`, `top_right`, `bottom_left`, `bottom_right`
+
+<img src="screenshot/modern-column.png" width="380" align="right" alt="Column layout">
+
+The next match with its countdown, then the upcoming matches grouped by day, then the latest results (W/L).
+
+Opponents without a logo get their initials; tournaments without an opponent (FNCS…) show the event and the game pictogram; unknown opponents show "To be decided".
+
+<br clear="right">
+
+### Hero — `upper_third`, `middle_center`, `lower_third`, `fullscreen_*`
+
+One match, big, with both logos, the countdown, and the two next matches underneath.
+
+![Hero layout](screenshot/modern-hero.png)
+
+When a match is live, the score takes the centre with a pulsing red **LIVE** marker (screenshot at the top).
+
+### List — `layout: "list"`
+
+A full-width agenda grouped by day: past results with W/L and score, then the upcoming matches with their countdown.
+
+![List layout](screenshot/modern-list.png)
+
+### Classic theme — `theme: "classic"`
+
+The original design, kept unchanged: a scrolling banner (`displayMode: "banner"`) or a static list (`displayMode: "list"`).
+
+![Classic banner](screenshot/classic-banner.png)
 
 ---
 
@@ -13,119 +57,81 @@ cd ~/MagicMirror/modules
 git clone https://github.com/FabienBounoir/MMM-GENTLEMATE-ESPORT.git
 ```
 
-No external npm dependencies — only Node.js built-ins.
-
----
+No npm dependencies, only Node.js built-ins.
 
 ## Configuration
 
 ```js
 {
   module: "MMM-GENTLEMATE-ESPORT",
-  position: "bottom_bar",
+  position: "top_bar",
   config: {
     email: "your@email.com",
-    password: "yourPassword"
+    password: "yourPassword",
+    logoTheme: "white",
+    gameNameStyle: "full",
+    excludeGames: ["TFT", "AOE"]
   }
 }
 ```
 
-## Screenshots
+The email and password are those of your Gentle Mates account (the data comes from the Gentle Mates Supabase backend). The session token is cached and only renewed when it expires.
 
-![Banner mode](screenshot/visual.png)
-
-*Example of the scrolling banner showing upcoming matches.*
-
-![List mode](screenshot/full-render.png)
-
-*Static list layout with dates, teams and scores.*
-
-
-### All options
+### Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `email` | `""` | Supabase account e-mail |
-| `password` | `""` | Supabase account password |
-| `updateInterval` | `10` | Refresh interval in minutes |
-| `numberOfFutureMatches` | `10` | Max upcoming matches to display |
-| `numberOfPastMatches` | `3` | Max past matches to display |
-| `pastDays` | `7` | How many days back to fetch past matches |
-| `use24HourTime` | `true` | `false` for AM/PM format |
-| `logoTheme` | `"dark"` | `"dark"` or `"white"` logo variant |
-| `displayMode` | `"banner"` | Classic theme only: `"banner"` (horizontal scroll) or `"list"` (vertical static) |
-| `excludeGames` | `[]` | List of game `short_name` values to hide (see below) |
-| `theme` | `"modern"` | `"modern"` (new design, adapts to the position) or `"classic"` (the original banner/list design) |
-| `layout` | `"auto"` | Modern theme only: `"auto"`, `"banner"`, `"column"`, `"hero"` or `"list"` |
-| `coloredPictos` | `true` | Modern theme only: game tags and pictograms in the game colour (`false` = white) |
+| `email` | `""` | Gentle Mates account e-mail |
+| `password` | `""` | Gentle Mates account password |
+| `theme` | `"modern"` | `"modern"` or `"classic"` (the original design) |
+| `layout` | `"auto"` | Modern only: `"auto"` (from the position), `"banner"`, `"column"`, `"hero"` or `"list"` |
+| `coloredPictos` | `true` | Modern only: game tags and pictograms in the game colour (`false` = white) |
 | `scrollSpeed` | `25` | Modern banner only: scroll speed in px/s when the matches don't fit |
+| `displayMode` | `"banner"` | Classic only: `"banner"` (scrolling) or `"list"` (static) |
+| `logoTheme` | `"dark"` | `"dark"` or `"white"` team logos (`"white"` suits a mirror) |
+| `gameNameStyle` | `"short"` | `"short"` (RL) or `"full"` (Rocket League) |
+| `excludeGames` | `[]` | Games to hide, by `short_name` (see below) |
+| `hideUnknownTeams` | `false` | Hide matches whose opponent is not known yet |
+| `numberOfFutureMatches` | `10` | Max upcoming matches |
+| `numberOfPastMatches` | `3` | Max past results |
+| `pastDays` | `10` | How many days back to fetch results |
+| `use24HourTime` | `true` | `false` for AM/PM |
+| `updateInterval` | `5` | Refresh interval, in minutes |
 
----
+### Filtering games
 
-## Themes
-
-**Modern** (default) picks its layout from the module position:
-
-| Position | Layout |
-|----------|--------|
-| `top_bar`, `bottom_bar`, `top_center`, `bottom_center` | **Banner**: next match large, the following ones beside it, scrolling only when they don't fit |
-| `top_left`, `top_right`, `bottom_left`, `bottom_right` | **Column**: next match, upcoming matches grouped by day, latest results (W/L) |
-| `upper_third`, `middle_center`, `lower_third`, `fullscreen_*` | **Hero**: one match, large, with countdown or live score |
-
-Force one with `layout`, or use `layout: "list"` for a full-width list grouped by day.
-Only white and greys are used, so it reads well behind a two-way mirror. Tournaments without an opponent show the event name, unknown opponents show "To be decided".
-
-**Classic** is the original design, unchanged:
-
-```js
-config: {
-  theme: "classic",
-  displayMode: "banner"   // or "list"
-}
-```
-
----
-
-## Filtering games
-
-Use `excludeGames` to hide matches for specific games. Pass an array of `short_name` values (case-insensitive).
-
-```js
-config: {
-  excludeGames: ["TFT", "AOE"],  // hide Teamfight Tactics and Age of Empires
-}
-```
-
-Available game identifiers:
+`excludeGames` takes the games' `short_name` (case-insensitive):
 
 | Game | `short_name` |
 |------|-------------|
 | Rocket League | `RL` |
-| Fortnite | `Fortnite` |
-| Valorant | `Valorant` |
-| Counter-Strike 2 | `CS2` |
+| Fortnite | `FT` |
+| Valorant | `VCT` |
+| Valorant Game Changers | `VCT GC` |
 | Call of Duty | `CoD` |
 | Warzone | `WZ` |
 | Teamfight Tactics | `TFT` |
 | Age of Empires | `AOE` |
 | Fighting Games | `FGC` |
 
-Leave `excludeGames` empty (default) to display all games.
-
 ---
 
 ## Features
 
-- Modern theme adapting to the position (banner, column, hero, list), classic theme kept as an option
-- Game badge per match (logo + short name, coloured with the game's brand colour)
-- Live match indicator, countdown to the next match
-- Win/loss score colouring
-- Featured match highlight
-- JWT token caching — re-authenticates only on expiry
-- Tri-lingual: English, French, Spanish
+- Layout chosen from the position: banner, column, hero or list; classic theme kept as an option
+- Game shown on every match, as a pill in the game's colour
+- Countdown ("in 25 min"), Tonight / Tomorrow / weekday labels
+- Live score with a pulsing red marker
+- Latest results with win/loss
+- Smooth, slow scrolling only when the matches don't fit, without jumps on refresh
+- English, French and Spanish
 
----
+## Test
+
+```bash
+node test.js
+```
 
 ## License
 
-MIT — Author: FabienBounoir
+MIT — FabienBounoir
