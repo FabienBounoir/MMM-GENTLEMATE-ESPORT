@@ -1,6 +1,6 @@
 /*
  * MMM-GENTLEMATE-ESPORT — modern theme (config.theme = "modern").
- * Light & greys only: colours barely show through a two-way mirror.
+ * Light & greys, except game colours and the red live marker.
  */
 
 .gmm { color: #b3b3b3; font-size: 16px; line-height: 1.2; text-align: left; }
@@ -45,10 +45,12 @@
 .gmm-picto { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
 .gmm-white { filter: brightness(0) invert(1); opacity: 0.85; }
 
-/* Live: a pulsing white dot, no colour */
-.gmm-live { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
-.gmm-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; animation: gmm-pulse 1.6s ease-in-out infinite; }
-@keyframes gmm-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+/* Live: red, the only colour that must be seen at a glance. Dot + ripple ring. */
+.gmm-live { display: inline-flex; align-items: center; gap: 8px; color: #ff3b30; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.gmm-dot { position: relative; width: 10px; height: 10px; border-radius: 50%; background: #ff3b30; animation: gmm-pulse 1.6s ease-in-out infinite; }
+.gmm-dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #ff3b30; animation: gmm-ripple 1.6s ease-out infinite; }
+@keyframes gmm-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+@keyframes gmm-ripple { from { transform: scale(1); opacity: 0.9; } to { transform: scale(2.8); opacity: 0; } }
 
 .gmm-day { display: flex; flex-direction: column; gap: 8px; }
 

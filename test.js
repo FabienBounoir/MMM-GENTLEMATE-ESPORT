@@ -36,6 +36,10 @@ const payload = {
   ],
 };
 
+// ponytail: processData reads the wall clock, so the test pins it to the fixture's day.
+const RealDate = Date, NOW = new RealDate(2026, 10, 12, 19, 5);
+global.Date = class extends RealDate { constructor(...a) { super(...(a.length ? a : [NOW])); } static now() { return +NOW; } };
+
 mod.config.logoTheme = "white";
 mod.processData(payload);
 const v = mod.buildView(mod.matches, new Date(2026, 10, 12, 19, 5));
