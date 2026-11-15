@@ -15,5 +15,8 @@
   "TBD": "To be decided",
   "RESULTS": "Latest results",
   "WIN_SHORT": "W",
-  "LOSS_SHORT": "L"
+  "LOSS_SHORT": "L",
+  "WATCH_ON_TV": "Watch on TV",
+  "TV_SENT": "Playing on the TV",
+  "TV_FAILED": "Couldn't reach Home Assistant"
 }

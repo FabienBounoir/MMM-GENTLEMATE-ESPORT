@@ -91,6 +91,21 @@
 .gmm-hero-mid .gmm-dim { font-size: 20px; }
 .gmm-then { gap: 40px; font-size: 16px; }
 
+/* ─── Live QR code (config.liveQrUrl) ───────────────────────── */
+/* White background: scanners need dark modules on a light ground. */
+.gmm-qr { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+.gmm-qr img { width: 96px; height: 96px; background: #fff; border-radius: 6px; }
+.gmm-qr .gmm-dim { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.gmm--column .gmm-qr, .gmm--list .gmm-qr { flex-direction: row; gap: 12px; }
+/* Banner: same box as the 84px logo it replaces, with the logo in the middle
+   (the QR code's error correction covers it). */
+.gmm-qr-icon { position: relative; flex-shrink: 0; width: 84px; height: 84px; }
+.gmm-qr-icon > img { width: 84px; height: 84px; background: #fff; border-radius: 6px; }
+.gmm-qr-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 2px; border-radius: 50%; background: #000; }
+/* 26px badge max: with error correction Q, bigger fails to scan on short links. */
+.gmm-qr-badge .gmm-icon, .gmm-qr-badge .gmm-mono { width: 22px; height: 22px; font-size: 9px; }
+.gmm-qr-badge .gmm-mono { background: #000; }
+
 /* ─── Column (top_left, top_right, …) ───────────────────────── */
 .gmm--column { display: flex; flex-direction: column; gap: 22px; width: 340px; max-width: 100%; }
 .gmm-col-next { display: flex; flex-direction: column; gap: 10px; }

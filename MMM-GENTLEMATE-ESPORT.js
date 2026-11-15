@@ -21,12 +21,15 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     layout: "auto",              // modern only: "auto" | "banner" | "column" | "hero" | "list"
     coloredPictos: true,         // modern only: game pictograms and tags in the game colour (false = white)
     scrollSpeed: 25,             // modern banner: scroll speed in px/s when the matches don't fit
+    liveQr: false,               // modern only: QR code of the stream while a match is live
+    homeAssistantWebhook: "",    // with liveQr: the QR code calls this webhook (?url=<stream>) instead of opening the stream
   },
 
   bannerScrolls: false,
 
   requiresVersion: "2.1.0",
   matches: [],
+  qrs: {},
 
   getTranslations: function () {
     return {
@@ -162,6 +165,7 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
     const scrollSeconds = Math.max(1, Math.round((rest.length * 262) / this.config.scrollSpeed));
     return {
       layout: this.pickLayout(),
+      qr: (next && next.live && this.qrs[next._m.id]) || null,
       pictoFilter: this.config.coloredPictos ? "" : " gmm-white",
       scrolling: this.bannerScrolls,
       scrollSeconds,
@@ -180,6 +184,8 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
       password: this.config.password,
       anonKey: this.config.anonKey,
       pastDays: this.config.pastDays,
+      liveQr: this.config.liveQr,
+      homeAssistantWebhook: this.config.homeAssistantWebhook,
     });
   },
 
@@ -280,6 +286,7 @@ Module.register("MMM-GENTLEMATE-ESPORT", {
       return;
     }
 
+    this.qrs = payload.qrs || {};
     const teamsMap = {};
     payload.teams.forEach((t) => { teamsMap[t.id] = t; });
 

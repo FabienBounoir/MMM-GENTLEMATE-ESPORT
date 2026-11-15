@@ -57,7 +57,7 @@ cd ~/MagicMirror/modules
 git clone https://github.com/FabienBounoir/MMM-GENTLEMATE-ESPORT.git
 ```
 
-No npm dependencies, only Node.js built-ins.
+No npm dependencies, only Node.js built-ins. The optional live QR code (`liveQr`) needs one: run `npm install` in the module folder to use it.
 
 ## Configuration
 
@@ -87,6 +87,8 @@ The email and password are those of your Gentle Mates account (the data comes fr
 | `layout` | `"auto"` | Modern only: `"auto"` (from the position), `"banner"`, `"column"`, `"hero"` or `"list"` |
 | `coloredPictos` | `true` | Modern only: game tags and pictograms in the game colour (`false` = white) |
 | `scrollSpeed` | `25` | Modern banner only: scroll speed in px/s when the matches don't fit |
+| `liveQr` | `false` | Modern only: while a match is live, a QR code of its stream (Twitch or YouTube) replaces the logo in the banner |
+| `homeAssistantWebhook` | `""` | With `liveQr`: the QR code puts the stream on your TV through this Home Assistant webhook instead (see below) |
 | `displayMode` | `"banner"` | Classic only: `"banner"` (scrolling) or `"list"` (static) |
 | `logoTheme` | `"dark"` | `"dark"` or `"white"` team logos (`"white"` suits a mirror) |
 | `gameNameStyle` | `"short"` | `"short"` (RL) or `"full"` (Rocket League) |
@@ -135,3 +137,48 @@ node test.js
 ## License
 
 MIT — FabienBounoir
+
+### Live QR code
+
+With `liveQr: true`, while a match is live the module shows a QR code of its stream (the Twitch or YouTube link from the Gentle Mates API): scan it to watch on your phone. In the banner it takes the place of the logo, with the logo in its middle.
+
+#### Put the stream on the TV with Home Assistant
+
+Add `homeAssistantWebhook` and the QR code puts the stream on your TV instead. It opens a small page served by the mirror (`http://<mirror IP>:8080/MMM-GENTLEMATE-ESPORT/tv`), which POSTs to the webhook with `?url=<stream link>`. Going through the mirror keeps the webhook id out of the QR code and avoids the "download file?" prompt phones show for Home Assistant's empty webhook answer. The mirror must be reachable from the phone (`address: "0.0.0.0"`, `ipWhitelist: []`).
+
+```js
+liveQr: true,
+homeAssistantWebhook: "http://homeassistant.local:8123/api/webhook/<random id>"
+```
+
+Example automation for an Android TV (`androidtv_remote` integration opens the stream in the Twitch or YouTube app). Only Twitch and YouTube links are accepted, since anyone on the network can call the webhook:
+
+```yaml
+alias: Gentle Mates live on the TV
+triggers:
+  - trigger: webhook
+    webhook_id: <random id>
+    allowed_methods: [POST]
+    local_only: true
+variables:
+  # Android TV opens https://twitch.tv links in the browser: use the app link instead.
+  stream: >-
+    {%- set u = trigger.query.get('url', '') %}
+    {%- set tw = u | regex_findall('^https://(?:www\.)?twitch\.tv/([A-Za-z0-9_]+)/?$') -%}
+    {%- if tw %}twitch://stream/{{ tw[0] | lower }}
+    {%- elif u is match('^https://((www\.|m\.)?youtube\.com|youtu\.be)/[A-Za-z0-9_@./?=&%-]+$') %}{{ u }}
+    {%- else %}twitch://stream/gentlemates{%- endif %}
+actions:
+  - if:
+      - condition: state
+        entity_id: remote.living_room_tv
+        state: "off"
+    then:
+      - action: remote.turn_on
+        target: { entity_id: remote.living_room_tv }
+      - delay: { seconds: 8 }
+  - action: remote.turn_on
+    target: { entity_id: remote.living_room_tv }
+    data: { activity: "{{ stream }}" }
+mode: single
+```

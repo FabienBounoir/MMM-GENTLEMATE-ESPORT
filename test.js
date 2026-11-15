@@ -55,6 +55,13 @@ assert.strictEqual(v.rest[1].sub, "Heats Groupe 1");
 assert.deepStrictEqual(v.results.map((r) => [r.wl, r.score, r.kind, r.mono]), [["V", "3-0", "mono", "DG"], ["D", "0-3", "logo", "VI"]]);
 assert.deepStrictEqual(v.listDays.map((d) => d.label), ["Lundi 09/11", "Mercredi 11/11", "Ce soir", "Samedi 14/11"]);
 
+// Live QR: off by default, shown only while the next match is live.
+assert.strictEqual(v.qr, null);
+mod.qrs = { c: "data:qr" };
+assert.strictEqual(mod.buildView(mod.matches, new Date(2026, 10, 12, 19, 5)).qr, null);
+mod.matches[2].is_live = true;
+assert.strictEqual(mod.buildView(mod.matches, new Date(2026, 10, 12, 19, 40)).qr, "data:qr");
+
 for (const [pos, layout] of [["top_bar", "banner"], ["bottom_right", "column"], ["middle_center", "hero"], ["fullscreen_above", "hero"], ["top_center", "banner"]]) {
   mod.data.position = pos;
   assert.strictEqual(mod.pickLayout(), layout, pos);
@@ -62,4 +69,35 @@ for (const [pos, layout] of [["top_bar", "banner"], ["bottom_right", "column"], 
 mod.config.theme = "classic";
 assert.strictEqual(mod.getTemplate(), "templates/MMM-GENTLEMATE-ESPORT.njk");
 
-console.log("MMM-GENTLEMATE-ESPORT : OK");
+// node_helper builds the QR as an SVG data URI (needs npm install).
+const Mod = require("module"), load = Mod._load;
+Mod._load = (r, ...a) => (r === "node_helper" ? { create: (o) => o } : load(r, ...a));
+const helper = require("./node_helper.js");
+const live = [{ id: "c", is_live: true, twitch_live_link: "twitch.tv/nikof" }, { id: "d", is_live: false }];
+const urls = [];
+const qrFor = helper.qrFor;
+helper.qrFor = (u) => { urls.push(u); return qrFor.call(helper, u); };
+helper.name = "MMM-GENTLEMATE-ESPORT";
+helper.mirrorUrl = () => "http://mirror:8080";
+global.config = { language: "fr" };
+const calls = [];
+global.fetch = async (u, o) => { calls.push([u, o.method]); return { ok: true }; };
+const res = { status(c) { this.code = c; return this; }, type() { return this; }, send(b) { this.body = b; } };
+Promise.all([
+  helper.liveQrs(false, "http://ha:8123/api/webhook/x", live),
+  helper.liveQrs(true, "", live.concat({ id: "e", is_live: true })),
+  helper.liveQrs(true, "http://ha:8123/api/webhook/x", live),
+]).then(async ([off, direct, ha]) => {
+  assert.deepStrictEqual(off, {});
+  // Without Home Assistant: the stream itself, and no QR for a live match without a link.
+  assert.deepStrictEqual(Object.keys(direct), ["c"]);
+  assert.deepStrictEqual(Object.keys(ha), ["c"]);
+  assert.deepStrictEqual(urls, ["https://twitch.tv/nikof", "http://mirror:8080/MMM-GENTLEMATE-ESPORT/tv?url=twitch.tv/nikof"]);
+  assert.ok(ha.c.startsWith("data:image/svg+xml;base64,"));
+  // The phone's page calls the webhook with the full stream link and answers HTML.
+  await helper.sendToTv({ query: { url: "twitch.tv/nikof" } }, res);
+  assert.deepStrictEqual(calls, [["http://ha:8123/api/webhook/x?url=https%3A%2F%2Ftwitch.tv%2Fnikof", "POST"]]);
+  assert.strictEqual(res.code, 200);
+  assert.ok(res.body.includes("Lancé sur la TV"));
+  console.log("MMM-GENTLEMATE-ESPORT : OK");
+});

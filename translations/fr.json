@@ -15,5 +15,8 @@
   "TBD": "À déterminer",
   "RESULTS": "Derniers résultats",
   "WIN_SHORT": "V",
-  "LOSS_SHORT": "D"
+  "LOSS_SHORT": "D",
+  "WATCH_ON_TV": "Regarder sur la TV",
+  "TV_SENT": "Lancé sur la TV",
+  "TV_FAILED": "Impossible de joindre Home Assistant"
 }

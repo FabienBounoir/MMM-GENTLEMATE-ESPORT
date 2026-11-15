@@ -31,6 +31,17 @@
 
 {% macro bigline(v) %}{% if v.live and v.score %}{{ v.score }}{% else %}{{ v.time }}{% endif %}{% endmacro %}
 
+{# Shown only while the next match is live and config.liveQr is on. #}
+{% macro qr() %}
+  {% if view.qr %}<div class="gmm-qr"><img src="{{ view.qr }}" alt=""><span class="gmm-dim">{{ 'WATCH_ON_TV' | translate }}</span></div>{% endif %}
+{% endmacro %}
+
+{# Banner: the QR takes the logo's place, the logo sits small in its middle. #}
+{% macro iconOrQr(v, pf) %}
+  {% if view.qr %}<div class="gmm-qr-icon"><img src="{{ view.qr }}" alt=""><span class="gmm-qr-badge">{{ icon(v, 's', pf) }}</span></div>
+  {% else %}{{ icon(v, 'xl', pf) }}{% endif %}
+{% endmacro %}
+
 {% set pf = view.pictoFilter %}
 <div class="gmm gmm--{{ view.layout }}">
 
@@ -41,7 +52,7 @@
 {% elif view.layout === 'banner' %}
   {% if view.next %}{% set v = view.next %}
   <div class="gmm-banner-next">
-    {{ icon(v, 'xl', pf) }}
+    {{ iconOrQr(v, pf) }}
     <div class="gmm-stack">
       {{ game(v, pf) }}
       <div class="gmm-row">{{ when(v) }}<span class="gmm-time">{{ bigline(v) }}</span></div>
@@ -82,6 +93,7 @@
       {% if v.live %}<span class="gmm-live"><span class="gmm-dot"></span>{{ 'LIVE' | translate }}</span>
       {% elif v.score %}<span class="gmm-dim">{{ v.wl }}</span>
       {% else %}<span class="gmm-dim">{{ v.dayLabel }}{% if v.countdown %} · {{ v.countdown }}{% endif %}</span>{% endif %}
+      {{ qr() }}
     </div>
     <div class="gmm-hero-team">
       {{ icon(v, 'xxl', pf) }}
@@ -110,6 +122,7 @@
     </div>
     {{ game(v, pf) }}
     <div class="gmm-dim gmm-ellipsis">{{ v.sub }}</div>
+    {{ qr() }}
   </div>
   {% endif %}
   {% for d in view.restDays %}
@@ -143,6 +156,7 @@
 
 {# ═══════════ LIST ═══════════ #}
 {% else %}
+  {{ qr() }}
   {% for d in view.listDays %}
     <div class="gmm-day">
       <span class="gmm-label{% if d.matches[0].dayKey === view.next.dayKey %} gmm-bright{% endif %}">{{ d.label }}</span>
